@@ -19,11 +19,13 @@ export async function POST(
   const { token: rawToken } = await context.params;
   const token = decodeURIComponent(rawToken);
   const [executionId] = token.split(":");
-
+  console.log("[approval] lookup", { rawToken, token, executionId });
   const execution = await db.query.workflowExecutions.findFirst({
     where: eq(workflowExecutions.id, executionId),
     with: { workflow: true },
   });
+    console.log("[approval] found", Boolean(execution));
+
 
   if (!execution) {
     return NextResponse.json({ error: "Run not found" }, { status: 404 });
