@@ -48,6 +48,12 @@ const SYSTEM_ACTIONS: ActionType[] = [
     category: "System",
   },
   {
+    id: "Approval",
+    label: "Approval",
+    description: "Pause until someone approves or rejects",
+    category: "System",
+  },
+  {
     id: "Database Query",
     label: "Database Query",
     description: "Query your database",

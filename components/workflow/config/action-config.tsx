@@ -219,6 +219,33 @@ function ConditionFields({
   );
 }
 
+// Approval fields component
+function ApprovalFields({
+  config,
+  onUpdateConfig,
+  disabled,
+}: {
+  config: Record<string, unknown>;
+  onUpdateConfig: (key: string, value: string) => void;
+  disabled: boolean;
+}) {
+  return (
+    <div className="space-y-2">
+      <Label htmlFor="approval-message">Approval Message</Label>
+      <TemplateBadgeInput
+        disabled={disabled}
+        id="approval-message"
+        onChange={(value) => onUpdateConfig("message", value)}
+        placeholder="e.g., Save this temperature reading to the sheet?"
+        value={(config?.message as string) || ""}
+      />
+      <p className="text-muted-foreground text-xs">
+        The run waits here until someone approves or rejects it.
+      </p>
+    </div>
+  );
+}
+
 // System action fields wrapper - extracts conditional rendering to reduce complexity
 function SystemActionFields({
   actionType,
@@ -256,6 +283,14 @@ function SystemActionFields({
           onUpdateConfig={onUpdateConfig}
         />
       );
+    case "Approval":
+      return (
+        <ApprovalFields
+          config={config}
+          disabled={disabled}
+          onUpdateConfig={onUpdateConfig}
+        />
+      );
     default:
       return null;
   }
@@ -266,6 +301,7 @@ const SYSTEM_ACTIONS: Array<{ id: string; label: string }> = [
   { id: "HTTP Request", label: "HTTP Request" },
   { id: "Database Query", label: "Database Query" },
   { id: "Condition", label: "Condition" },
+  { id: "Approval", label: "Approval" },
 ];
 
 const SYSTEM_ACTION_IDS = SYSTEM_ACTIONS.map((a) => a.id);

@@ -28,6 +28,7 @@ import {
   selectedExecutionIdAtom,
 } from "@/lib/workflow-store";
 import { findActionById } from "@/plugins";
+import { ApprovalActions } from "./approval-actions";
 import { Button } from "../ui/button";
 import { Spinner } from "../ui/spinner";
 
@@ -445,6 +446,7 @@ function ExecutionLogEntry({
 
       {/* Step content */}
       <div className="min-w-0 flex-1">
+        <ApprovalActions log={log} />
         <button
           className="group w-full rounded-lg py-2 text-left transition-colors hover:bg-muted/50"
           onClick={onToggle}

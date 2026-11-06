@@ -1,4 +1,5 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { WorkflowPlayground } from "./playground";
 import {
   Copy,
   Eraser,
@@ -668,6 +669,7 @@ export const PanelInner = () => {
                 </Button>
               </div>
               <div className="flex-1 space-y-4 overflow-y-auto p-4">
+                <WorkflowPlayground />
                 <WorkflowRuns
                   isActive={activeTab === "runs"}
                   onRefreshRef={refreshRunsRef}
@@ -1015,6 +1017,7 @@ export const PanelInner = () => {
               </Button>
             </div>
             <div className="flex-1 space-y-4 overflow-y-auto p-4">
+              <WorkflowPlayground />
               <WorkflowRuns
                 isActive={activeTab === "runs"}
                 onRefreshRef={refreshRunsRef}

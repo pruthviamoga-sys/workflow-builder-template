@@ -17,6 +17,8 @@ import type { StepContext } from "./steps/step-handler";
 import { triggerStep } from "./steps/trigger";
 import { getErrorMessageAsync } from "./utils";
 import type { WorkflowEdge, WorkflowNode } from "./workflow-store";
+import { createHook } from "workflow";
+import { approvalDoneStep, approvalWaitStep } from "./steps/approval";
 
 // System actions that don't have plugins - maps to module import functions
 const SYSTEM_ACTIONS: Record<string, StepImporter> = {
@@ -201,6 +203,32 @@ function evaluateConditionExpression(
   return { result: Boolean(conditionExpression), resolvedValues: {} };
 }
 
+type ApprovalDecision = { approved: boolean };
+
+/**
+ * Pauses the run until someone approves or rejects it.
+ * Must run in workflow context (createHook is not allowed inside a step).
+ */
+async function waitForApproval(
+  config: Record<string, unknown>,
+  context: StepContext
+) {
+  const token = `${context.executionId}:${context.nodeId}`;
+  const hook = createHook<ApprovalDecision>({ token });
+  const wait = await approvalWaitStep({
+    token,
+    message: typeof config.message === "string" ? config.message : undefined,
+    _context: context,
+  });
+  const decision = await hook;
+  await approvalDoneStep({
+    logId: wait.logId,
+    startTime: wait.startTime,
+    approved: decision.approved,
+  });
+  return { approved: decision.approved };
+}
+
 /**
  * Execute a single action step with logging via stepHandler
  * IMPORTANT: Steps receive only the integration ID as a reference to fetch credentials.
@@ -213,6 +241,9 @@ async function executeActionStep(input: {
   context: StepContext;
 }) {
   const { actionType, config, outputs, context } = input;
+    if (actionType === "Approval") {
+    return await waitForApproval(config, context);
+  }
 
   // Build step input WITHOUT credentials, but WITH integrationId reference and logging context
   const stepInput: Record<string, unknown> = {
