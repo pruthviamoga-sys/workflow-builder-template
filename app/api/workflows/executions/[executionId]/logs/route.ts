@@ -49,7 +49,7 @@ export async function GET(
     // Even though data should already be redacted when stored, this provides defense in depth
     const redactedLogs = logs.map((log) => ({
       ...log,
-      input: redactSensitiveData(log.input),
+      input: log.nodeType === "Approval" ? log.input : redactSensitiveData(log.input),
       output: redactSensitiveData(log.output),
     }));
 
